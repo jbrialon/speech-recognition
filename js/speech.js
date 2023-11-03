@@ -53,6 +53,13 @@ var colors = [
   "yellow",
 ];
 
+function speak(text) {
+  if ("speechSynthesis" in window) {
+    var to_speak = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(to_speak);
+  }
+}
+
 var recognition = new SpeechRecognition();
 if (SpeechGrammarList) {
   // SpeechGrammarList is not currently available in Safari, and does not have any effect in any other browser.
@@ -101,18 +108,22 @@ recognition.onresult = function (event) {
 
   var color = event.results[0][0].transcript;
   button.innerHTML = "Start Recognition";
+  speak(`Result received: ${color}.`);
   diagnostic.innerHTML = `Result received: ${color}.<br /> Confidence: ${event.results[0][0].confidence}`;
   bg.style.backgroundColor = color;
 };
 
 recognition.onspeechend = function () {
+  console.log("stop");
   recognition.stop();
 };
 
 recognition.onnomatch = function (event) {
+  speak("I didn't recognise that color.");
   diagnostic.textContent = "I didn't recognise that color.";
 };
 
 recognition.onerror = function (event) {
+  speak(`Error occurred in recognition: ${event.error}`);
   diagnostic.textContent = `Error occurred in recognition: ${event.error}`;
 };
